@@ -472,11 +472,6 @@ function Controller() {
         cellProgram.setRules(this.alive, this.dead);
     };
 
-    this.changeCellProgram = function(value) {
-        if (value === 0) cellProgram.useLifeProgram();
-        else cellProgram.useGenerationsProgram();
-    };
-
     this.updateTargets = function() {
         renderTargets.initialize(this.tWidth, this.tHeight);
         window.onresize();
@@ -531,8 +526,9 @@ function initGui() {
         guiRulesDead.add(cont.dead, i).name(i + ' neighbors').onChange(cont.setRules.bind(cont));
     }
 
-    onFamilyChange(cont.activeFamily);
-    onPresetChange(cont.activePreset);
+	//Default config for rules
+    onFamilyChange(0);
+    onPresetChange(0);
 
     // surface folder
     var guiSurface = gui.addFolder('Surface Properties');
@@ -548,13 +544,15 @@ function initGui() {
     }
 
     function onFamilyChange(value) {
-        if (value === 0){
+
+        value = cont.activeFamily;
+
+        if (value == 0){
             presets.setFamilyLife();
             iGenerations.__li.style.display = 'none';
             params.paintSaturation = 0.8;
             params.paintColorDecay = 0.2;
-        }
-        else {
+        } else if (value == 1){
             presets.setFamilyGenerations();
             iGenerations.__li.style.display = '';
             params.paintSaturation = 0.3;
@@ -566,7 +564,10 @@ function initGui() {
         iPreset = iPreset.options(presets.getNames()).name('Preset').onChange(onPresetChange);
         iPreset.__select.selectedIndex = cont.activePreset;
         onPresetChange(cont.activePreset);
-        cont.changeCellProgram(value);
+
+        if (value == 0) {cellProgram.useLifeProgram();} 
+        if (value == 1) {cellProgram.useGenerationsProgram();} 
+
     }
 
     function onPresetChange(index) {
